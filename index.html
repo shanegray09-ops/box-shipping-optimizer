@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#111111">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Box Shipping Optimizer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0b0b0b;
+      margin: 0;
+      padding: 0;
+      color: #e5c07b;
+    }
+    .container {
+      max-width: 420px;
+      margin: auto;
+      padding: 20px;
+      background: linear-gradient(180deg, #111111, #1a1a1a);
+      min-height: 100vh;
+    }
+    h1 {
+      text-align: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #f5d27a;
+      letter-spacing: 0.5px;
+    }
+    h2 {
+      font-size: 16px;
+      margin-top: 20px;
+      color: #f5d27a;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #e7c873;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      background: #0f0f0f;
+      color: #f5d27a;
+      border: 1px solid #3a3a3a;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      margin-top: 25px;
+      background: linear-gradient(135deg, #c9a23f, #f5d27a);
+      color: #111111;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    button:hover {
+      background: linear-gradient(135deg, #b89432, #eac15f);
+    }
+    .results {
+      margin-top: 25px;
+      padding: 15px;
+      background: #0f0f0f;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid #3a3a3a;
+    }
+    .result-value {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 10px;
+      color: #f5d27a;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      text-align: center;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <div style="text-align:center; margin-bottom:10px;">
+      <div style="font-size:20px; font-weight:700; letter-spacing:1px; color:#f5d27a;">
+        LEGACY PROFIT CO.
+      </div>
+      <div style="font-size:11px; letter-spacing:1.5px; color:#c9a23f; margin-top:2px;">
+        BUILDING WEALTH · CREATING SUCCESS
+      </div>
+    </div>
+    <h1>📦 Box Shipping Optimizer</h1>
+
+    <h2>Large Box Dimensions</h2>
+    <label>Length</label>
+    <input id="L" type="number" step="any" />
+    <label>Width</label>
+    <input id="W" type="number" step="any" />
+    <label>Height</label>
+    <input id="H" type="number" step="any" />
+
+    <h2>Small Box Dimensions</h2>
+    <label>Length</label>
+    <input id="l" type="number" step="any" />
+    <label>Width</label>
+    <input id="w" type="number" step="any" />
+    <label>Height</label>
+    <input id="h" type="number" step="any" />
+
+    <button onclick="optimize()">Optimize Packing</button>
+
+    <div class="results" id="results" style="display:none;">
+      <div>Maximum Boxes</div>
+      <div class="result-value" id="maxBoxes"></div>
+      <div style="margin-top:10px;">Best Orientation</div>
+      <div class="result-value" id="bestRotation"></div>
+    </div>
+
+    <div class="footer">Powered by <strong>Legacy Profit Co.</strong> · Public Tool · Mobile Friendly</div>
+  </div>
+
+  <script>
+    function optimize() {
+      const L = parseFloat(document.getElementById('L').value);
+      const W = parseFloat(document.getElementById('W').value);
+      const H = parseFloat(document.getElementById('H').value);
+      const l = parseFloat(document.getElementById('l').value);
+      const w = parseFloat(document.getElementById('w').value);
+      const h = parseFloat(document.getElementById('h').value);
+
+      if ([L,W,H,l,w,h].some(v => isNaN(v) || v <= 0)) {
+        alert('Please enter valid positive numbers for all dimensions.');
+        return;
+      }
+
+      const rotations = {
+        "L-W-H": [l,w,h],
+        "L-H-W": [l,h,w],
+        "W-L-H": [w,l,h],
+        "W-H-L": [w,h,l],
+        "H-L-W": [h,l,w],
+        "H-W-L": [h,w,l]
+      };
+
+      let bestCount = 0;
+      let bestRotation = "";
+
+      for (const [name, dims] of Object.entries(rotations)) {
+        const fitL = Math.floor(L / dims[0]);
+        const fitW = Math.floor(W / dims[1]);
+        const fitH = Math.floor(H / dims[2]);
+        const total = fitL * fitW * fitH;
+
+        if (total > bestCount) {
+          bestCount = total;
+          bestRotation = name;
+        }
+      }
+
+      document.getElementById('maxBoxes').innerText = bestCount;
+      document.getElementById('bestRotation').innerText = bestRotation;
+      document.getElementById('results').style.display = 'block';
+    }
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
+</body>
+</html>
